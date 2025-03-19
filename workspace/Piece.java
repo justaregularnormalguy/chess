@@ -50,7 +50,18 @@ public class Piece {
     //return a list of every square that is "controlled" by this piece. A square is controlled
     //if the piece capture into it legally.
     public ArrayList<Square> getControlledSquares(Square[][] board, Square start) {
-     return null;
+      ArrayList<Square> moves = new ArrayList<>();
+      int [] rows =    {-1,-2, -3, -2, -2, -3, -3, -3, -3, -3,    1, 2, 3, 2, 2, 3, 3, 3, 3, 3 };
+      int [] columns = {0, 0, 0, -1,    1, 0, -1, 1, 2, -2,       0, 0, 0, -1, 1, 0, -1, 1, 2, -2};
+      for(int k = 0 ; k < rows.length; k++){ 
+          int j = columns [k];
+          int i = rows [k];
+          if(start.getRow()+i >=0 && start.getRow()+i<8&& start.getCol()+j >=0 && start.getCol()+j<8 ){
+            moves.add(board[start.getRow()+i][start.getCol()+j]);
+          }
+      
+      }
+    	return moves;
     }
     
 
@@ -61,6 +72,18 @@ public class Piece {
     //please note that your piece must have some sort of logic. Just being able to move to every square on the board is not
     //going to score any points.
     public ArrayList<Square> getLegalMoves(Board b, Square start){
-    	return null;
+      ArrayList<Square> moves = new ArrayList<>();
+      
+      int [] rows =    {-1,-2, -3, -2, -2, -3, -3, -3, -3, -3,    1, 2, 3, 2, 2, 3, 3, 3, 3, 3 };
+      int [] columns = {0, 0, 0, -1,    1, 0, -1, 1, 2, -2,       0, 0, 0, -1, 1, 0, -1, 1, 2, -2};
+      for(int k = 0 ; k < rows.length; k++){ 
+          int j = columns [k];
+          int i = rows [k];
+          if(start.getRow()+i >=0 && start.getRow()+i<8&& start.getCol()+j >=0 && start.getCol()+j<8 && (!b.getSquareArray()[start.getRow()+i][start.getCol()+j].isOccupied() || b.getSquareArray()[start.getRow()+i][start.getCol()+j].getOccupyingPiece().getColor() != color) ){
+            moves.add(b.getSquareArray()[start.getRow()+i][start.getCol()+j]);
+          }
+      
+      }
+    	return moves;
     }
 }

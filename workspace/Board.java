@@ -64,6 +64,21 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener 
 //        	populate the board with squares here. Note that the board is composed of 64 squares alternating from 
 //        	white to black.
 
+boolean color = true;
+        for (int i = 0; i<board.length; i++ ){
+            for (int j = 0; j <board[i].length; j++ ){
+                board[i][j] = new Square(this, color, i, j);
+                this.add(board[i][j]);
+                if (color) {
+                    color = false;
+                }
+                else {
+                    color = true;
+                }
+            }
+            color = !color;
+        }
+
         initializePieces();
 
         this.setPreferredSize(new Dimension(400, 400));
@@ -81,7 +96,7 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener 
 	//it's up to you how you wish to arrange your pieces.
     private void initializePieces() {
     	
-    	board[0][0].put(new Piece(true, RESOURCES_WKING_PNG));
+    	board[3][3].put(new Piece(true, RESOURCES_WKING_PNG));
 
     }
 
@@ -152,6 +167,19 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener 
         
         //using currPiece
         
+       if (currPiece != null && currPiece.getLegalMoves(this, fromMoveSquare).contains(endSquare)){
+        endSquare.put(currPiece);
+        fromMoveSquare.removePiece();
+        whiteTurn = !whiteTurn;
+       }
+
+        
+
+        for(Square [] row: board){
+            for(Square s: row){
+                s.setBorder(null);
+            }
+        }
        
         fromMoveSquare.setDisplay(true);
         currPiece = null;
@@ -163,6 +191,11 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener 
         currX = e.getX() - 24;
         currY = e.getY() - 24;
 
+        if(currPiece!= null){
+            for(Square s: currPiece.getLegalMoves(this, fromMoveSquare)){
+                s.setBorder(BorderFactory.createLineBorder(Color.blue));
+            }
+        }
         repaint();
     }
 
