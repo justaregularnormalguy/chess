@@ -32,6 +32,14 @@ public class Board extends JPanel implements MouseListener, MouseMotionListener 
 	private static final String RESOURCES_WQUEEN_PNG = "wqueen.png";
 	private static final String RESOURCES_WPAWN_PNG = "wpawn.png";
 	private static final String RESOURCES_BPAWN_PNG = "bpawn.png";
+    //custom pieces
+    private static final String RESOURCES_WSLIME_PNG = "whiteSlime.png";
+    private static final String RESOURCES_BSLIME_PNG = "blackSlime.png";
+    private static final String RESOURCES_BCONE_PNG = "chessPiece.png";
+    private static final String RESOURCES_WCONE_PNG = "chessPieceInverted.png";
+    private static final String RESOURCES_BJESTER_PNG = "bjester.png";
+    private static final String RESOURCES_WJESTER_PNG = "wjester.png";
+
 	
 	// Logical and graphical representations of board
 	private final Square[][] board;
@@ -89,15 +97,80 @@ boolean color = true;
         whiteTurn = true;
 
     }
-
+    public boolean isInCheck(boolean kingColor){
+        //loop through the whole board
+        for (int k = 0; k<board.length; k++ ){
+            for (int q = 0; q <board[k].length; q++ ){
+                 //for every square in the baord you want to know is that square occupied? if it is occupied is the piece there the OPPOSITE color of kindColor?
+                if (board[k][q].isOccupied() && board[k][q].getOccupyingPiece().getColor() != kingColor) {
+                     //if so you want to call .getControlledSquares on that piece which gives a list of squares
+                     ArrayList<Square> enemySquares = board[k][q].getOccupyingPiece().getControlledSquares(board, board[k][q]);
+                         //loop through all the controlledsquares and ask each one do you contain a piece of type king (use instanceof King) and is this king the SAME color as kingColor
+           
+                         for (Square controlled :enemySquares ) {
+                        if (controlled.getOccupyingPiece() instanceof King && controlled.getOccupyingPiece().getColor() == kingColor ) {
+                            return true;
+                        }
+                         }
+                }
+            }
+        }
+            return false;
+        
+        
+       
+       
+       
+        //if all that happens you're in check! Return true. If that NEVER happens (so after all the loops are done) return false
+    }
+    
     
 	//set up the board such that the black pieces are on one side and the white pieces are on the other.
 	//since we only have one kind of piece for now you need only set the same number of pieces on either side.
 	//it's up to you how you wish to arrange your pieces.
     private void initializePieces() {
-    	
-    	board[3][3].put(new Piece(true, RESOURCES_WKING_PNG));
+    	//populates the board with white pieces
+    	//0
+        board[0][0].put(new Knight(true, RESOURCES_WKNIGHT_PNG));
+        board[0][1].put(new Queen(false, RESOURCES_BQUEEN_PNG));
+        board[0][2].put(new King(true, RESOURCES_WKING_PNG));
+        board[0][3].put(new Slime(true, RESOURCES_WSLIME_PNG));
+        board[0][4].put(new Cone(true, RESOURCES_WCONE_PNG));
+        board[0][5].put(new Jester(true, RESOURCES_WJESTER_PNG));
+        board[0][6].put(new Slime(true, RESOURCES_WSLIME_PNG));
+        board[0][7].put(new Bishop(true, RESOURCES_WBISHOP_PNG));
+        board[1][0].put(new Pawn(true, RESOURCES_WPAWN_PNG));
+        board[1][1].put(new Pawn(true, RESOURCES_WPAWN_PNG));
+        board[1][2].put(new Pawn(true, RESOURCES_WPAWN_PNG));
+        board[1][3].put(new Pawn(true, RESOURCES_WPAWN_PNG));
+        board[1][4].put(new Pawn(true, RESOURCES_WPAWN_PNG));
+        board[1][5].put(new Pawn(true, RESOURCES_WPAWN_PNG));
+        board[1][6].put(new Pawn(true, RESOURCES_WPAWN_PNG));
+        board[1][7].put(new Pawn(true, RESOURCES_WPAWN_PNG));
 
+
+        
+        //7
+ //up to [1][7] from [0][7]
+        //populates the board with black pieces
+        board[7][0].put(new Knight(false, RESOURCES_BKNIGHT_PNG));
+        board[7][1].put(new Queen(false, RESOURCES_BQUEEN_PNG));
+        board[7][2].put(new King(false, RESOURCES_BKING_PNG));
+        board[7][3].put(new Slime(false, RESOURCES_BSLIME_PNG));
+        board[7][4].put(new Cone(false, RESOURCES_BCONE_PNG));
+        board[7][5].put(new Jester(false, RESOURCES_BJESTER_PNG));
+        board[7][6].put(new Slime(false, RESOURCES_BSLIME_PNG));
+        board[7][7].put(new Bishop(false, RESOURCES_BBISHOP_PNG));
+        board[6][0].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+        board[6][1].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+        board[6][2].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+        board[6][3].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+        board[6][4].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+        board[6][5].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+        board[6][6].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+        board[6][7].put(new Pawn(false, RESOURCES_BPAWN_PNG));
+
+//up to [7][7] from [6][0]
     }
 
     public Square[][] getSquareArray() {
@@ -132,7 +205,7 @@ boolean color = true;
             if ((currPiece.getColor() && whiteTurn)
                     || (!currPiece.getColor()&& !whiteTurn)) {
                 final Image img = currPiece.getImage();
-                g.drawImage(img, currX, currY, null);
+                g.drawImage(img.getScaledInstance(50, 50, 0), currX, currY, null);
             }
         }
         
@@ -167,10 +240,21 @@ boolean color = true;
         
         //using currPiece
         
-       if (currPiece != null && currPiece.getLegalMoves(this, fromMoveSquare).contains(endSquare)){
+
+       if (currPiece != null && currPiece.getLegalMoves(this, fromMoveSquare).contains(endSquare) && currPiece.getColor() == whiteTurn){
+        Piece Z= endSquare.getOccupyingPiece();
         endSquare.put(currPiece);
         fromMoveSquare.removePiece();
-        whiteTurn = !whiteTurn;
+        System.out.println("is in check: "+isInCheck(whiteTurn));
+        if (isInCheck(whiteTurn)) {
+           fromMoveSquare.put(currPiece);
+           endSquare.removePiece();
+           endSquare.put(Z);
+        }
+        else {
+        whiteTurn = !whiteTurn;    
+        }
+        
        }
 
         
@@ -180,8 +264,8 @@ boolean color = true;
                 s.setBorder(null);
             }
         }
-       
-        fromMoveSquare.setDisplay(true);
+        if(fromMoveSquare!= null)
+            fromMoveSquare.setDisplay(true);
         currPiece = null;
         repaint();
     }
